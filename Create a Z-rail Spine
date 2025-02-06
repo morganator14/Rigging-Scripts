@@ -22,6 +22,8 @@ centers=[]
 for eachGrp in grps:
     centers.append(cmds.xform ( eachGrp, query = True, translation = True, ws=True ))
 cmds.curve(n='mainSpine',d=1,p=centers)
+cmds.select('curveShape1')
+cmds.rename('mainSpineShape')
 cmds.duplicate('mainSpine',n='zSpine')
 cmds.select('zSpine')
 cmds.xform(t=cmds.pointPosition('ctrl0.cv[3]'))
