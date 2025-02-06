@@ -1,9 +1,10 @@
 import maya.cmds as cmds
-joints = cmds.ls(type='joint')
-for eachJoint in joints:
-    newGroup = cmds.group( em=True, name= 'grp1_%s' % eachJoint)
-    newCircle = cmds.circle(nr=(1,0,0), c=(0, 0, 0), r=1.5, n='ctrl1_%s' % eachJoint)
-    cmds.parent('ctrl1_%s' % eachJoint, 'grp1_%s' % eachJoint, relative=True)
-constraint = cmds.parentConstraint(eachJoint, 'grp1_%s' % eachJoint)
-cmds.parentConstraint(eachJoint, 'grp1_%s' % eachJoint)
-cmds.delete(constraint)
+groups = cmds.ls("grp*")
+quan=len(groups)
+for index in range(quan):
+    val=index
+    newCircle = cmds.circle(nr=(1,0,0), c=(0, 0, 0), r=1.5, n='ctrl%d'%val)
+    newGroup = cmds.group(newCircle, name= 'grp_ctrl%d'%val)
+    constraint = cmds.parentConstraint('grp_jnt%s'%val, 'grp_ctrl%d'%val)
+    cmds.delete(constraint)
+    cmds.parentConstraint('grp_ctrl%d'%val,'jnt%s'%val)
