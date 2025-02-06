@@ -1,0 +1,39 @@
+import maya.cmds as cmds
+joints=cmds.ls('jnt*', typ='joint')
+groups=cmds.ls('grp_jnt*',et='transform')
+path=cmds.ls('mainSpineShape')
+zSpine=cmds.ls('zSpineShape')
+targetCurve = 'mainSpine' 
+curveCVs = cmds.ls('{0}.cv[:]'.format(targetCurve),fl=True) 
+count=len(curveCVs)
+increment=100/(count-1)
+initial=increment
+for i in range(1,count):
+    curveCVs[i]=initial
+    initial+=increment
+curveCVs[0]=0.0
+index=0
+for eachJnt in joints:
+    mp = cmds.createNode('motionPath', n='mpMainSpine0')
+    cmds.connectAttr('mainSpineShape.worldSpace[0]', mp + '.geometryPath')
+    uVal=curveCVs[index]
+    cmds.setAttr(mp + '.uValue',uVal/100)
+    index+=1
+    cmds.setAttr(mp + '.fractionMode', True)
+    cmds.setAttr(mp + '.worldUpType', 1)
+    cmds.setAttr(mp + '.frontAxis', 0)
+    cm =cmds.createNode('composeMatrix', n='cmMainSpine0')
+    cmds.connectAttr(mp + '.allCoordinates', cm + '.inputTranslate')
+    cmds.connectAttr(mp+'.rotate',cm+'.inputRotate')
+    mm=cmds.createNode('multMatrix', n='mmMainSpine0')
+    cmds.connectAttr(cm + '.outputMatrix',mm+'.matrixIn[0]')
+    cmds.connectAttr(mm+'.matrixSum',eachJnt+'.offsetParentMatrix')
+    mp2=cmds.createNode('motionPath',n='mpZspine0')
+    cmds.connectAttr('zSpineShape.worldSpace[0]',mp2+'.geometryPath')
+    cmds.connectAttr(mp+'.uValue',mp2+'.uValue')
+    cm2=cmds.createNode('composeMatrix',n='cmZspine0')
+    cmds.connectAttr(mp2 + '.allCoordinates', cm2 + '.inputTranslate')
+    cmds.connectAttr(cm2+'.outputMatrix',mp+'.worldUpMatrix')
+    grp=cmds.listRelatives(eachJnt,p=True)
+    cmds.connectAttr(grp[0]+'.worldInverseMatrix[0]',mm+'.matrixIn[1]')
+    i+=1
