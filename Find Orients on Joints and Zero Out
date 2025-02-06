@@ -1,0 +1,20 @@
+import maya.cmds as cmds
+joints = cmds.ls(type = 'joint')
+imposters = []
+for j in joints:
+    cmds.setAttr(j + '.segmentScaleCompensate', 0)
+    orientX = cmds.getAttr(j + '.jointOrientX')
+    orientY = cmds.getAttr(j + '.jointOrientY')
+    orientZ = cmds.getAttr(j + '.jointOrientZ')
+    if orientY > 0:
+        imposters.append(j)
+    if orientX > 0:
+        imposters.append(j)
+    if orientZ > 0:
+        imposters.append(j)
+print(imposters)
+
+for i in imposters:
+    cmds.setAttr( i +'.jointOrientY', 0)
+    cmds.setAttr( i +'.jointOrientX', 0)
+    cmds.setAttr( i +'.jointOrientZ', 0)
