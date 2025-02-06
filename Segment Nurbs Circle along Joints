@@ -1,0 +1,8 @@
+import maya.cmds as cmds
+joints = cmds.ls(type='joint')
+for eachJoint in joints:
+    joint_translate = cmds.xform(eachJoint, query=True, translation=True, worldSpace=True)
+    joint_rotate = cmds.xform(eachJoint, query=True, rotation=True, worldSpace=True)
+    newCircle = cmds.circle(nr=(1,0,0), c=(0, 0, 0), r=1.5, n='Circle1_%s' % eachJoint)
+    cmds.xform(newCircle[0], translation=joint_translate, worldSpace=True)
+    cmds.xform(newCircle[0], rotation=joint_rotate, worldSpace=True)
