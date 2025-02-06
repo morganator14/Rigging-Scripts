@@ -1,0 +1,56 @@
+import maya.cmds as cmds
+count = 6
+for index in range(count):
+    val=index
+    newJoint= cmds.joint( name='jnt%d'%val)
+    newGroup= cmds.group( n='grp_jnt%d'%val)
+    if val > 0:
+        otherVal=val-1
+        cmds.parent('grp_jnt%d'%val, 'jnt%d'%otherVal)
+        cmds.move( 5, 0, 0, 'grp_jnt%d'%val, r=True)
+groups = cmds.ls("grp*")
+quan=len(groups)
+for index in range(quan):
+    valu=index
+    newCircle = cmds.circle(nr=(1,0,0), c=(0, 0, 0), r=1.5, n='ctrl%d'%valu)
+    newGroup = cmds.group(newCircle, name= 'grp_ctrl%d'%valu)
+    constraint = cmds.parentConstraint('grp_jnt%s'%valu, 'grp_ctrl%d'%valu)
+    cmds.delete(constraint)
+    cmds.parentConstraint('grp_ctrl%d'%valu,'jnt%s'%valu)
+grps=cmds.ls('grp_jnt*')
+centers=[]
+for eachGrp in grps:
+    centers.append(cmds.xform ( eachGrp, query = True, translation = True, ws=True ))
+cmds.curve(n='mainSpine',d=1,p=centers)
+cmds.duplicate('mainSpine',n='zSpine')
+cmds.select('zSpine')
+cmds.xform(t=cmds.pointPosition('ctrl0.cv[3]'))
+ctrls=cmds.ls('ctrl*')
+gps=cmds.ls('grp_jnt*')
+evens=[]
+for i in range(len(ctrls)):
+    if i%2==0:
+        evens.append(ctrls[i])
+for i in range(len(evens)):
+    cmds.parentConstraint(evens[i],gps[i],mo=True)
+targetCurve = 'mainSpine'
+curveCVs = cmds.ls('{0}.cv[:]'.format(targetCurve), fl = True)
+for cv in curveCVs:
+    cmds.cluster(cv,n='clustMainSpine')
+targetCurve2 = 'zSpine'
+curveCVs = cmds.ls('{0}.cv[:]'.format(targetCurve2), fl = True)
+for cv in curveCVs:
+    cmds.cluster(cv,n='clustzSpine')
+clusters = cmds.ls('clustMainSpine*',tr=True)
+ctrls = cmds.ls( 'ctrl*', ap=True, tr=True)
+for i in range(len(clusters)):
+    cmds.parentConstraint(ctrls[i], clusters[i-1], sr=["y"], mo=True)
+zclusters = cmds.ls('clustzSpine*',tr=True)
+ctrls = cmds.ls( 'ctrl*', ap=True, tr=True)
+for i in range(len(zclusters)):
+    cmds.parentConstraint(ctrls[i], zclusters[i-1], sr=["y"], mo=True)
+gro=cmds.ls('grp_ctrl*')
+for g in range(len(gro)):
+    for c in range(len(evens)):
+        cmds.parent(gro[g+1],evens[c])
+        g+=1
