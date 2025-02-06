@@ -1,0 +1,43 @@
+import maya.cmds as cmds
+count = 6
+joints=[]
+groups=[]
+ctrls= []
+rots = []
+for c in range(count):
+    jnt = cmds.joint(n='jnt%s' % c)
+    grp = cmds.group(jnt, n='grp_jnt%s' % c)
+    joints.append(jnt)
+    groups.append(grp)
+    if c > 0:
+        if c % 2 == 0:
+            pos = cmds.parentConstraint(groups[c-1], groups[c])
+            cmds.delete(pos)
+            cmds.xform(r=True, t=[3,0,1])
+            aim = cmds.aimConstraint(groups[c],groups[c-1])
+            cmds.delete(aim)
+            cmds.parent(groups[c],joints[c-1])
+        else:
+            pos = cmds.parentConstraint(groups[c-1], groups[c])
+            cmds.delete(pos)
+            cmds.xform(r=True, t=[2,0,2])
+            aim = cmds.aimConstraint(groups[c],groups[c-1])
+            cmds.delete(aim)
+            cmds.parent(groups[c],joints[c-1])
+    cmds.select(clear=True)
+    ctrl = cmds.circle(n='ctrl_jnt%s' % c)
+    grp_ctrl = cmds.group(ctrl, n='grp_ctrl_jnt%s' % c)  
+    ctrls.append(ctrl)
+    cmds.select('ctrl_jnt%s' % c + '.cv[0:7]')  
+    cmds.rotate(0,90,0)
+    constraint = cmds.parentConstraint(groups[c], grp_ctrl)
+    cmds.delete(constraint)
+
+for p in range(count):
+    const = cmds.parentConstraint('grp_jnt%s' % p, 'grp_ctrl_jnt%s' % p, mo = False)
+    cmds.delete(const)
+    if p > 0:
+        cmds.parent('grp_ctrl_jnt%s' % p, ctrls[p-1])
+    cmds.parentConstraint('ctrl_jnt%s' % p, 'jnt%s' % p)
+    
+cmds.select(clear=True)
