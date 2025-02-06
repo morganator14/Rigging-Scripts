@@ -1,0 +1,7 @@
+import maya.cmds as cmds
+targetCurve = '' # Curve to put clusters on
+curveCVs = cmds.ls('{0}.cv[:]'.format(targetCurve), fl = True) # Get all cvs from curve
+if curveCVs: # Check if we found any cvs
+    for cv in curveCVs:
+        print('Creating {0}'.format(cv))
+        cmds.cluster(cv) # Create cluster on a cv
