@@ -1,0 +1,15 @@
+import maya.cmds as cmds
+count=12
+cubes = []
+groups = []
+for i in range(count):
+    cube = cmds.polyCube(n='obj%s'%i)
+    grp = cmds.group(cube, n='grp_obj%s'%i)
+    cubes.append(cube[0])
+    groups.append(grp)
+    if i > 0:
+        cmds.parent(groups[i],cubes[i-1])
+        cmds.setAttr(grp+'.translateX',5)
+        
+for g in groups:
+    cmds.setAttr(g+'.rotateY',30)
